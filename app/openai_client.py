@@ -15,26 +15,62 @@ def ask_openai(question: str, context: str) -> str:
     """
     try:
         # Create the prompt with context and question
-        prompt = f"""Based on the following recent news articles, {question}
+        prompt = f"""You are a financial expert and market analyst. Analyze the following news and provide a data-focused response about {question}
 
-Context:
+Context from recent news:
 {context}
 
-Please provide a concise and clear explanation based only on the provided news context. If the context doesn't contain relevant information, please state that."""
+Requirements for your response:
+1. Format EXACTLY as shown below with all sections
+2. MUST include specific numbers, percentages, and metrics
+3. Each key factor must start with a relevant metric or number
+4. Include market sentiment indicators
+5. Highlight critical dates and timelines
+6. Each section must be separated by a blank line
+
+Your response MUST follow this EXACT format:
+
+Article Date:
+[Date of the most recent article in DD-MM-YYYY format]
+
+Source:
+[Source name and URL if available]
+
+Market Sentiment:
+[BULLISH/BEARISH/NEUTRAL] with [X%] confidence
+
+Key Metrics:
+• [Specific number/percentage] - [Key metric explanation]
+• [Specific number/percentage] - [Key metric explanation]
+• [Specific number/percentage] - [Key metric explanation]
+• [Specific number/percentage] - [Key metric explanation]
+
+Impact Factors:
+• [Quantified impact] - [Factor with specific numbers]
+• [Quantified impact] - [Factor with specific numbers]
+• [Quantified impact] - [Factor with specific numbers]
+
+Technical Indicators:
+• [Indicator name]: [Specific value/range]
+• [Indicator name]: [Specific value/range]
+• [Indicator name]: [Specific value/range]
+
+Outlook:
+[Data-driven prediction with specific numbers and timeframes]"""
 
         # Call OpenAI API
         response = client.chat.completions.create(
-            model="gpt-4",  # You can change this to gpt-3.5-turbo for lower cost
+            model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a financial news analyst who provides clear, concise explanations about market movements based on news articles."},
+                {"role": "system", "content": "You are an expert financial analyst. Focus on providing specific numbers, metrics, and quantifiable data. Always include dates, sentiment analysis, and source information. Format response exactly as requested with all sections."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=300
+            max_tokens=500
         )
 
         return response.choices[0].message.content.strip()
 
     except Exception as e:
         print(f"Error calling OpenAI API: {str(e)}")
-        return "Sorry, I encountered an error while processing your request."
+        return "I apologize, but I'm having trouble analyzing the market data at the moment. Please try again shortly."
