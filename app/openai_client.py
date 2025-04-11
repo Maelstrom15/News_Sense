@@ -2,7 +2,6 @@
 import os
 from openai import OpenAI
 from dotenv import load_dotenv
-from datetime import datetime
 
 # Load environment variables
 load_dotenv()
@@ -15,56 +14,47 @@ def ask_openai(question: str, context: str) -> str:
     Ask OpenAI a question with context and get a response
     """
     try:
-        # Create the prompt with context and question
-        prompt = f"""You are a financial expert and market analyst. Analyze the latest news and market data to provide a detailed, data-driven response about {question}
+        # Create a more flexible prompt
+        prompt = f"""You are a senior financial analyst with expertise in stocks, ETFs, and market trends. 
+        Provide a concise, data-driven response to the following question:
 
-Context from recent news:
-{context}
+        Question: {question}
 
-Requirements for your response:
-1. Focus on specific funds, ETFs, and stocks that are directly impacted
-2. Include actual prices, percentages, and YTD performance where available
-3. Organize information into clear sections with numerical data
-4. Provide actionable insights and recommendations
-5. Use exact numbers and current market data
-6. Keep the analysis focused and relevant to the question
+        Context from recent news:
+        {context}
 
-Your response MUST follow this EXACT format:
+        Guidelines for your response:
+        1. FIRST analyze what type of question this is (about a stock, ETF, sector, or general market concept)
+        2. For stock-specific questions:
+           - Focus on that stock's performance, key metrics, and news
+           - Only mention related funds if they're highly relevant
+        3. For fund/ETF questions:
+           - Provide current price, YTD performance, and key holdings
+           - Explain sector exposures and risk factors
+        4. Always include:
+           - Current market data (price, change, volume)
+           - Relevant timeframes (YTD, 1-month, etc.)
+           - Clear, actionable insights
+        5. Structure your response logically based on the question type
+        6. Be concise but include all key numbers and data points
 
-Based on your question about [topic], the following [assets/funds/sectors] are affected:
-
-1. Directly Impacted Funds:
-[List each relevant fund/ETF with the following data points]
-- Fund Name (TICKER): [YTD performance]%. Current Price: $[price]
-[Brief explanation of why this fund is impacted]
-[Continue listing relevant funds in the same format]
-
-2. Key Impact Metrics:
-- Direct Impact: [Specific impact on prices/performance]
-- Sector Exposure: [Relevant sector exposures]
-- Risk Assessment: [Key risk metrics and data]
-
-3. Actionable Insights:
-- [First key insight with specific recommendation]
-- [Second key insight with specific recommendation]
-- [Third key insight with specific recommendation]
-
-Would you like specific details about any of these [assets/funds]?"""
+        Important: Do NOT force a rigid structure. Adapt to the question.
+        If asking about a specific stock, don't list unrelated funds.
+        """
 
         # Call OpenAI API
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a financial analyst expert focused on providing accurate, data-driven analysis with specific numbers, current prices, and actionable insights. Always include actual market data and performance metrics in your responses."},
+                {"role": "system", "content": "You are a top financial analyst who provides precise, data-rich responses tailored to each question. You adapt your style based on whether the question is about stocks, ETFs, sectors, or general concepts."},
                 {"role": "user", "content": prompt}
             ],
-            temperature=0.7,
-            max_tokens=1000
+            temperature=0.5,  # Lower for more factual responses
+            max_tokens=800
         )
 
-        response_text = response.choices[0].message.content.strip()
-        return response_text
+        return response.choices[0].message.content.strip()
 
     except Exception as e:
         print(f"Error calling OpenAI API: {str(e)}")
-        return "I apologize, but I'm having trouble analyzing the market data. Please try again shortly."
+        return "I apologize, but I'm having trouble accessing the market data. Please try again shortly."
