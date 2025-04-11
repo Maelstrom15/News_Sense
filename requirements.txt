@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+beautifulsoup4
+requests
+spacy
+transformers
+torch
+fuzzywuzzy
+python-Levenshtein
+openai
+python-dotenv
+pytz
