@@ -3,6 +3,18 @@
 import { useState } from "react";
 import { Card, Title, LineChart, Text, AreaChart } from "@tremor/react";
 import { motion } from "framer-motion";
+import dynamic from "next/dynamic";
+
+const CorrelationHeatmap = dynamic(
+  () => import("../components/CorrelationHeatmap"),
+  {
+    ssr: false,
+  }
+);
+
+const ParetoAnalysis = dynamic(() => import("../components/ParetoAnalysis"), {
+  ssr: false,
+});
 
 const dummyData = [
   { date: "2024-01", value: 18000, volume: 1200 },
@@ -215,21 +227,23 @@ export default function Home() {
   };
 
   return (
-    <main className="container mx-auto p-6 min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
-      <Title className="text-3xl font-bold mb-8 text-indigo-900 text-center">
+    <main className="container mx-auto p-6 min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
+      <Title className="text-3xl font-bold mb-8 text-gray-100 text-center">
         News Sense Analytics Dashboard
       </Title>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Left Column - Analytics */}
         <div className="space-y-8">
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <Card className="bg-white shadow-xl rounded-xl">
-              <Title className="text-xl mb-4">📈 Market Trends</Title>
+            <Card className="bg-gray-800 shadow-xl rounded-xl border border-gray-700">
+              <Title className="text-xl mb-4 text-gray-100">
+                📈 Market Trends
+              </Title>
               <LineChart
                 data={dummyData}
                 index="date"
@@ -242,39 +256,31 @@ export default function Home() {
                 showYAxis={true}
               />
             </Card>
-          </motion.div>
+          </motion.div> */}
 
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Card className="bg-white shadow-xl rounded-xl">
-              <div className="grid grid-cols-2 gap-6">
-                <div className="p-4 bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl">
-                  <Text className="text-blue-800">🌡️ Temperature</Text>
-                  <Title className="mt-2 text-2xl text-blue-900">23°C</Title>
-                </div>
-                <div className="p-4 bg-gradient-to-br from-green-50 to-green-100 rounded-xl">
-                  <Text className="text-green-800">💰 Market Status</Text>
-                  <Title className="mt-2 text-2xl text-green-900">Active</Title>
-                </div>
-              </div>
-              <div className="mt-6">
-                <Text className="text-lg font-semibold mb-3">
-                  Trading Volume
-                </Text>
-                <AreaChart
-                  data={dummyData}
-                  index="date"
-                  categories={["volume"]}
-                  colors={["indigo"]}
-                  className="h-32"
-                  showAnimation={true}
-                  showLegend={false}
-                  showGridLines={false}
-                />
-              </div>
+            <Card className="bg-gray-800 shadow-xl rounded-xl border border-gray-700">
+              <Title className="text-xl mb-4 text-gray-100">
+                🔄 Correlation Analysis
+              </Title>
+              <CorrelationHeatmap />
+            </Card>
+          </motion.div> */}
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+          >
+            <Card className="bg-gray-800 shadow-xl rounded-xl border border-gray-700">
+              <Title className="text-xl mb-4 text-gray-100">
+                📊 Pareto Analysis
+              </Title>
+              <ParetoAnalysis />
             </Card>
           </motion.div>
         </div>
@@ -284,11 +290,11 @@ export default function Home() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-white rounded-xl shadow-xl p-6 flex flex-col h-[calc(100vh-8rem)]"
+          className="bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col h-[calc(100vh-8rem)] border border-gray-700"
         >
-          <div className="bg-gradient-to-r from-blue-100 to-blue-50 text-blue-800 px-6 py-3 rounded-xl mb-6 flex items-center">
+          <div className="bg-gradient-to-r from-blue-500/20 to-blue-400/10 text-gray-100 px-6 py-3 rounded-xl mb-6 flex items-center border border-blue-500/20">
             <span className="text-xl mr-2">💬</span>
-            <span className="font-semibold">Chat with N</span>
+            <span className="font-semibold">Chat with Myfi</span>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-6 mb-6 pr-4 custom-scrollbar">
@@ -302,8 +308,8 @@ export default function Home() {
                 <div
                   className={`max-w-[85%] rounded-xl p-4 ${
                     message.role === "user"
-                      ? "bg-gradient-to-r from-blue-500 to-blue-600 text-white"
-                      : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800"
+                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
+                      : "bg-gradient-to-r from-gray-700 to-gray-800 text-gray-100"
                   }`}
                 >
                   {message.role === "assistant" && message.content ? (
@@ -323,7 +329,7 @@ export default function Home() {
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800 rounded-xl p-4">
+                <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-gray-100 rounded-xl p-4">
                   <div className="flex items-center space-x-2">
                     <div className="animate-pulse">⏳</div>
                     <span>Analyzing market data...</span>
@@ -340,13 +346,13 @@ export default function Home() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about market trends..."
-                className="flex-1 p-3 border text-black border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-50"
+                className="flex-1 p-3 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-100 placeholder-gray-400"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={isLoading}
-                className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-8 py-3 rounded-xl hover:from-blue-600 hover:to-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200"
               >
                 Send
               </button>
