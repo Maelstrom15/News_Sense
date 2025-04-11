@@ -16,65 +16,53 @@ def ask_openai(question: str, context: str) -> str:
     """
     try:
         # Create the prompt with context and question
-        prompt = f"""You are a financial expert and market analyst. Analyze the latest news and provide a structured analysis about {question}
+        prompt = f"""You are a financial expert and market analyst. Analyze the latest news and market data to provide a detailed, data-driven response about {question}
 
 Context from recent news:
 {context}
 
 Requirements for your response:
-1. Format EXACTLY as shown below with all sections
-2. Include specific numbers and metrics
-3. Each section must be separated by a blank line
-4. Focus on actionable insights
+1. Focus on specific funds, ETFs, and stocks that are directly impacted
+2. Include actual prices, percentages, and YTD performance where available
+3. Organize information into clear sections with numerical data
+4. Provide actionable insights and recommendations
+5. Use exact numbers and current market data
+6. Keep the analysis focused and relevant to the question
 
 Your response MUST follow this EXACT format:
 
-Article Date:
-[Current date in DD-MM-YYYY format]
+Based on your question about [topic], the following [assets/funds/sectors] are affected:
 
-Source:
-[Source name and URL if available]
+1. Directly Impacted Funds:
+[List each relevant fund/ETF with the following data points]
+- Fund Name (TICKER): [YTD performance]%. Current Price: $[price]
+[Brief explanation of why this fund is impacted]
+[Continue listing relevant funds in the same format]
 
-Market Sentiment:
-[BULLISH/BEARISH/NEUTRAL] with [X%] confidence - Include justification
+2. Key Impact Metrics:
+- Direct Impact: [Specific impact on prices/performance]
+- Sector Exposure: [Relevant sector exposures]
+- Risk Assessment: [Key risk metrics and data]
 
-Key Metrics:
-• [Key metric 1] - [Explanation]
-• [Key metric 2] - [Explanation]
-• [Key metric 3] - [Explanation]
-• [Key metric 4] - [Explanation]
+3. Actionable Insights:
+- [First key insight with specific recommendation]
+- [Second key insight with specific recommendation]
+- [Third key insight with specific recommendation]
 
-Impact Factors:
-• [Factor 1] - [Impact explanation with numbers]
-• [Factor 2] - [Impact explanation with numbers]
-• [Factor 3] - [Impact explanation with numbers]
-
-Technical Indicators:
-• [Indicator 1]: [Current value and interpretation]
-• [Indicator 2]: [Current value and interpretation]
-• [Indicator 3]: [Current value and interpretation]
-
-Outlook:
-[Data-driven prediction with specific numbers and timeframes]"""
+Would you like specific details about any of these [assets/funds]?"""
 
         # Call OpenAI API
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are an expert financial analyst. Focus on providing clear, data-driven analysis with specific numbers and actionable insights."},
+                {"role": "system", "content": "You are a financial analyst expert focused on providing accurate, data-driven analysis with specific numbers, current prices, and actionable insights. Always include actual market data and performance metrics in your responses."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=800
+            max_tokens=1000
         )
 
         response_text = response.choices[0].message.content.strip()
-        
-        # Add current date if not present
-        if "Article Date:" in response_text and "DD-MM-YYYY" in response_text:
-            current_date = datetime.now().strftime("%d-%m-%Y")
-            response_text = response_text.replace("[Current date in DD-MM-YYYY format]", current_date)
-
         return response_text
 
     except Exception as e:
