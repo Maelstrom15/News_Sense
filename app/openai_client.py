@@ -16,70 +16,67 @@ def ask_openai(question: str, context: str) -> str:
     """
     try:
         # Create the prompt with context and question
-        prompt = f"""You are a financial expert and market analyst in 2025. Analyze the latest news and provide a forward-looking, data-focused response about {question}
+        prompt = f"""You are a financial expert and market analyst. Analyze the latest news and provide a structured analysis about {question}
 
 Context from recent news:
 {context}
 
 Requirements for your response:
 1. Format EXACTLY as shown below with all sections
-2. MUST include specific numbers, percentages, and metrics
-3. Each key factor must start with a relevant metric or number
-4. Include market sentiment indicators with forward projections
-5. Use the LATEST date from the news context (must be in 2025)
-6. Each section must be separated by a blank line
-7. Focus on future implications and trends
+2. Include specific numbers and metrics
+3. Each section must be separated by a blank line
+4. Focus on actionable insights
 
 Your response MUST follow this EXACT format:
 
 Article Date:
-[Use LATEST date from news context, must be in 2025. If no specific date in context, use current date in 2025]
+[Current date in DD-MM-YYYY format]
 
 Source:
 [Source name and URL if available]
 
 Market Sentiment:
-[BULLISH/BEARISH/NEUTRAL] with [X%] confidence - Include forward-looking justification
+[BULLISH/BEARISH/NEUTRAL] with [X%] confidence - Include justification
 
 Key Metrics:
-• [Current number/percentage] → [Projected number/percentage] - [Forward-looking metric explanation]
-• [Current number/percentage] → [Projected number/percentage] - [Forward-looking metric explanation]
-• [Current number/percentage] → [Projected number/percentage] - [Forward-looking metric explanation]
-• [Current number/percentage] → [Projected number/percentage] - [Forward-looking metric explanation]
+• [Key metric 1] - [Explanation]
+• [Key metric 2] - [Explanation]
+• [Key metric 3] - [Explanation]
+• [Key metric 4] - [Explanation]
 
 Impact Factors:
-• [Current impact] → [Projected impact by 2025] - [Factor with specific numbers]
-• [Current impact] → [Projected impact by 2025] - [Factor with specific numbers]
-• [Current impact] → [Projected impact by 2025] - [Factor with specific numbers]
+• [Factor 1] - [Impact explanation with numbers]
+• [Factor 2] - [Impact explanation with numbers]
+• [Factor 3] - [Impact explanation with numbers]
 
 Technical Indicators:
-• [Indicator name]: [Current value] → [Projected range for 2025]
-• [Indicator name]: [Current value] → [Projected range for 2025]
-• [Indicator name]: [Current value] → [Projected range for 2025]
+• [Indicator 1]: [Current value and interpretation]
+• [Indicator 2]: [Current value and interpretation]
+• [Indicator 3]: [Current value and interpretation]
 
 Outlook:
-[Data-driven prediction with specific numbers and timeframes, focused on 2025 and beyond]"""
+[Data-driven prediction with specific numbers and timeframes]"""
 
         # Call OpenAI API
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are an expert financial analyst in 2025. Focus on providing forward-looking analysis with specific numbers and projections. Always use the latest available date (must be in 2025) and include future-focused metrics. Make all predictions and analysis from a 2025 perspective."},
+                {"role": "system", "content": "You are an expert financial analyst. Focus on providing clear, data-driven analysis with specific numbers and actionable insights."},
                 {"role": "user", "content": prompt}
             ],
             temperature=0.7,
-            max_tokens=500
+            max_tokens=800
         )
 
-        # Ensure the response contains a 2025 date
         response_text = response.choices[0].message.content.strip()
-        if "2025" not in response_text:
-            # Add current date in 2025 if no date is found
-            current_2025_date = datetime.now().replace(year=2025).strftime("%d-%m-2025")
-            response_text = response_text.replace("Article Date:", f"Article Date:\n{current_2025_date}")
+        
+        # Add current date if not present
+        if "Article Date:" in response_text and "DD-MM-YYYY" in response_text:
+            current_date = datetime.now().strftime("%d-%m-%Y")
+            response_text = response_text.replace("[Current date in DD-MM-YYYY format]", current_date)
 
         return response_text
 
     except Exception as e:
         print(f"Error calling OpenAI API: {str(e)}")
-        return "I apologize, but I'm having trouble analyzing the latest market data. Please try again shortly."
+        return "I apologize, but I'm having trouble analyzing the market data. Please try again shortly."

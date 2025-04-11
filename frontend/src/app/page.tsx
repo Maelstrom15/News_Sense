@@ -306,10 +306,18 @@ export default function Home() {
                       : "bg-gradient-to-r from-gray-50 to-gray-100 text-gray-800"
                   }`}
                 >
-                  {message.role === "assistant" &&
-                  message.content.includes("Article Date:")
-                    ? formatAIResponse(message.content)
-                    : message.content}
+                  {message.role === "assistant" && message.content ? (
+                    typeof message.content === "string" &&
+                    message.content.includes("Market Sentiment:") ? (
+                      formatAIResponse(message.content)
+                    ) : (
+                      <div className="whitespace-pre-wrap">
+                        {message.content}
+                      </div>
+                    )
+                  ) : (
+                    message.content || ""
+                  )}
                 </div>
               </div>
             ))}
