@@ -15,9 +15,9 @@ A modern web application for natural language processing and information retriev
 └── venv/            # Python virtual environment
 ```
 
-## Demo Walkthrough
+## Demo
 
-[![Application Demo Video](docs/images/dashboard2.png)](docs/videos/demo-video.mp4)
+[![Application Demo Video](docs/images/dashboard.png)](docs/videos/demo-video.mp4)
 
 ![Application Demo GIF](docs/images/demo-video.gif)
 
