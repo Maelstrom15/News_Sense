@@ -53,7 +53,7 @@ const ParetoAnalysis = () => {
     title: {
       text: "Pareto Analysis: Negative News vs Fund Price",
       font: {
-        color: "#E5ECF6",
+        color: "#000000",
         size: 20,
       },
     },
@@ -63,7 +63,7 @@ const ParetoAnalysis = () => {
       title: {
         text: "Date",
         font: {
-          color: "#E5ECF6",
+          color: "#000000",
         },
       },
       tickangle: 45,
