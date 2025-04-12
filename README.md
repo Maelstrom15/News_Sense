@@ -15,6 +15,12 @@ A modern web application for natural language processing and information retriev
 └── venv/            # Python virtual environment
 ```
 
+## Demo
+
+### Video Walkthrough
+
+[![Application Demo Video](docs/images/dashboard.png)](docs/videos/demo-video.mp4)
+
 ## Prerequisites
 
 - Python 3.8 or higher
