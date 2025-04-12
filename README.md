@@ -1,4 +1,4 @@
-# NHCE-2 Project
+# Quantum Hackathon Project - PS1
 
 A modern web application for natural language processing and information retrieval.
 
@@ -19,6 +19,7 @@ A modern web application for natural language processing and information retriev
 
 ### Video Walkthrough
 
+Click the image to play the video
 [![Application Demo Video](docs/images/dashboard.png)](docs/videos/demo-video.mp4)
 
 ## Prerequisites
