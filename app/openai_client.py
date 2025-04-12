@@ -3,6 +3,7 @@ import os
 import re
 from openai import OpenAI
 from dotenv import load_dotenv
+from functools import lru_cache
 
 # Load environment variables
 load_dotenv()
@@ -28,6 +29,7 @@ def extract_price_change(text: str) -> tuple[float, str]:
         return float(up_match.group(1)), symbol
     return 0.0, symbol
 
+@lru_cache(maxsize=100)  # Cache up to 100 most recent responses
 def ask_openai(question: str, context: str) -> dict:
     """
     Ask OpenAI a question with context and get a response

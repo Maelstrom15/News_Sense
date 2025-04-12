@@ -243,7 +243,7 @@ export default function Home() {
     <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 p-8">
       <div className="max-w-[1600px] mx-auto">
         <Title className="text-4xl font-bold mb-10 text-gray-800 text-center bg-clip-text">
-          News Sense Analytics Dashboard
+          News Sense Dashboard
         </Title>
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
