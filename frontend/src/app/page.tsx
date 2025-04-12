@@ -201,7 +201,6 @@ export default function Home() {
     e.preventDefault();
     if (!input.trim()) return;
 
-    // Add user message
     const userMessage = { role: "user" as const, content: input };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
@@ -214,6 +213,25 @@ export default function Home() {
       );
       const data = await response.json();
 
+      // Extract price change information
+      const content = data.analysis.content;
+      let priceChangeInfo = null;
+
+      // Try to find specific stock change
+      const changeMatch = content.match(
+        /Change:\s*([+-]?\$?\d+\.?\d*)\s*\(([+-]?\d+\.?\d*)%\)/
+      );
+      const symbolMatch =
+        content.match(/status of ([A-Z]+)/i) ||
+        content.match(/([A-Z]+) Stock:/);
+
+      if (changeMatch && symbolMatch) {
+        priceChangeInfo = {
+          percentage: parseFloat(changeMatch[2]),
+          symbol: symbolMatch[1],
+        };
+      }
+
       setMessages((prev) => [
         ...prev,
         {
@@ -222,8 +240,8 @@ export default function Home() {
         },
       ]);
 
-      if (data.analysis.price_change) {
-        setPriceChange(data.analysis.price_change);
+      if (priceChangeInfo) {
+        setPriceChange(priceChangeInfo);
       }
     } catch (error) {
       setMessages((prev) => [
