@@ -27,11 +27,11 @@ const PriceChangeCard: React.FC<PriceChangeCardProps> = ({
     >
       <div className="flex items-center justify-between">
         <div className="space-y-1">
-          <h3 className="text-xl font-bold text-gray-100 flex items-center gap-2">
+          <h3 className="text-xl font-bold text-black flex items-center gap-2">
             {symbol}
             <span className="text-sm font-normal text-gray-400">ETF</span>
           </h3>
-          <p className="text-sm text-gray-400">Today's Change</p>
+          <p className="text-sm text-black">Today's Change</p>
         </div>
         <motion.div
           initial={{ scale: 0.9 }}

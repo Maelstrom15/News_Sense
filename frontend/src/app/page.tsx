@@ -5,6 +5,8 @@ import { Card, Title, LineChart, Text, AreaChart } from "@tremor/react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import PriceChangeCard from "../components/PriceChangeCard";
+import AIResponse from "../components/AIResponse";
+import PriceShiftAnalysis from "../components/PriceShiftAnalysis";
 
 const CorrelationHeatmap = dynamic(
   () => import("../components/CorrelationHeatmap"),
@@ -17,11 +19,12 @@ const ParetoAnalysis = dynamic(() => import("../components/ParetoAnalysis"), {
   ssr: false,
 });
 
-const dummyData = [
-  { date: "2024-01", value: 18000, volume: 1200 },
-  { date: "2024-02", value: 17800, volume: 1400 },
-  { date: "2024-03", value: 18200, volume: 1100 },
-  { date: "2024-04", value: 18100, volume: 1300 },
+const stockData = [
+  { date: "2024-01", price: 350.25, volume: 25000000 },
+  { date: "2024-02", price: 358.75, volume: 28000000 },
+  { date: "2024-03", price: 365.5, volume: 22000000 },
+  { date: "2024-04", price: 362.8, volume: 24000000 },
+  { date: "2024-05", price: 370.15, volume: 26000000 },
 ];
 
 interface Message {
@@ -237,9 +240,9 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 p-8">
       <div className="max-w-[1600px] mx-auto">
-        <Title className="text-4xl font-bold mb-10 text-gray-100 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+        <Title className="text-4xl font-bold mb-10 text-gray-800 text-center bg-clip-text">
           News Sense Analytics Dashboard
         </Title>
 
@@ -251,12 +254,20 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
             >
-              <Card className="bg-gray-800/50 backdrop-blur-sm shadow-2xl rounded-2xl border border-gray-700/50">
-                <Title className="text-xl mb-6 text-gray-100 flex items-center gap-2">
-                  <span className="text-blue-400">📊</span> Market Analysis
+              <Card className="bg-white/80 backdrop-blur-sm shadow-lg rounded-2xl border border-gray-200">
+                <Title className="text-xl mb-6 text-gray-800 flex items-center gap-2">
+                  <span className="text-blue-600">📊</span> Market Analysis
                 </Title>
                 <ParetoAnalysis />
               </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <PriceShiftAnalysis data={stockData} symbol="QQQ" />
             </motion.div>
           </div>
 
@@ -265,13 +276,15 @@ export default function Home() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl p-6 flex flex-col h-[calc(100vh-8rem)] border border-gray-700/50"
+            className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 flex flex-col h-[calc(100vh-8rem)] border border-gray-200"
           >
-            <div className="bg-gradient-to-r from-blue-500/20 to-blue-400/10 text-gray-100 px-6 py-4 rounded-xl mb-6 flex items-center gap-3 border border-blue-500/20">
+            <div className="bg-gradient-to-r from-blue-500/10 to-blue-400/5 px-6 py-4 rounded-xl mb-6 flex items-center gap-3 border border-blue-200">
               <span className="text-2xl">💬</span>
               <div>
-                <h2 className="font-semibold text-lg">Chat with Myfi</h2>
-                <p className="text-sm text-gray-400">
+                <h2 className="font-semibold text-lg text-gray-800">
+                  Chat with Myfi
+                </h2>
+                <p className="text-sm text-gray-600">
                   Your AI Financial Analyst
                 </p>
               </div>
@@ -283,38 +296,103 @@ export default function Home() {
                   key={index}
                   className={`flex ${
                     message.role === "user" ? "justify-end" : "justify-start"
-                  }`}
+                  } w-full`}
                 >
+                  {message.role === "assistant" && (
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3 flex-shrink-0">
+                      <span className="text-lg">🤖</span>
+                    </div>
+                  )}
                   <div
-                    className={`max-w-[85%] rounded-xl p-4 ${
-                      message.role === "user"
-                        ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg"
-                        : "bg-gradient-to-r from-gray-700/50 to-gray-800/50 text-gray-100 shadow-lg"
-                    }`}
+                    className={`${
+                      message.role === "user" ? "ml-auto" : ""
+                    } max-w-[85%]`}
                   >
-                    {message.role === "assistant" && message.content ? (
-                      typeof message.content === "string" &&
-                      message.content.includes("Market Sentiment:") ? (
-                        formatAIResponse(message.content)
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className={`rounded-2xl p-4 ${
+                        message.role === "user"
+                          ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-md ml-auto"
+                          : "bg-gray-50 border border-gray-200 text-gray-800 shadow-md"
+                      }`}
+                    >
+                      {message.role === "assistant" ? (
+                        <AIResponse content={message.content} />
                       ) : (
-                        <div className="whitespace-pre-wrap leading-relaxed">
-                          {message.content}
-                        </div>
-                      )
-                    ) : (
-                      message.content || ""
-                    )}
+                        <div className="text-white">{message.content}</div>
+                      )}
+                    </motion.div>
+                    <div
+                      className={`text-xs text-gray-500 mt-1 ${
+                        message.role === "user" ? "text-right" : "text-left"
+                      }`}
+                    >
+                      {message.role === "user" ? "You" : "Myfi AI"}
+                    </div>
                   </div>
+                  {message.role === "user" && (
+                    <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center ml-3 flex-shrink-0">
+                      <span className="text-sm">👤</span>
+                    </div>
+                  )}
                 </div>
               ))}
               {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-gradient-to-r from-gray-700/50 to-gray-800/50 text-gray-100 rounded-xl p-4 shadow-lg">
+                <div className="flex justify-start items-start">
+                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                    <span className="text-lg">🤖</span>
+                  </div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="bg-gray-50 text-gray-800 rounded-2xl p-4 shadow-md border border-gray-200"
+                  >
                     <div className="flex items-center gap-3">
-                      <div className="animate-pulse text-blue-400">⏳</div>
+                      <div className="flex space-x-1">
+                        <motion.div
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            opacity: [1, 0.5, 1],
+                          }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            repeatDelay: 0.2,
+                          }}
+                          className="w-2 h-2 bg-blue-500 rounded-full"
+                        />
+                        <motion.div
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            opacity: [1, 0.5, 1],
+                          }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            repeatDelay: 0.2,
+                            delay: 0.2,
+                          }}
+                          className="w-2 h-2 bg-blue-500 rounded-full"
+                        />
+                        <motion.div
+                          animate={{
+                            scale: [1, 1.2, 1],
+                            opacity: [1, 0.5, 1],
+                          }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            repeatDelay: 0.2,
+                            delay: 0.4,
+                          }}
+                          className="w-2 h-2 bg-blue-500 rounded-full"
+                        />
+                      </div>
                       <span>Analyzing market data...</span>
                     </div>
-                  </div>
+                  </motion.div>
                 </div>
               )}
             </div>
@@ -339,13 +417,13 @@ export default function Home() {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Ask about market trends..."
-                  className="flex-1 p-4 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700/50 text-gray-100 placeholder-gray-400"
+                  className="flex-1 p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-800 placeholder-gray-400"
                   disabled={isLoading}
                 />
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 font-medium shadow-lg"
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 font-medium shadow-md"
                 >
                   Send
                 </button>
