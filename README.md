@@ -19,8 +19,11 @@ A modern web application for natural language processing and information retriev
 
 ### Video Walkthrough
 
-Click the image to play the video
-[![Application Demo Video](docs/images/dashboard.png)](docs/videos/demo-video.mp4)
+The demo video is available through the following options:
+
+1. **Direct Download**: [Download Demo Video](docs/videos/demo-video.mp4)
+
+Note: Due to GitHub's file size limitations, please use one of the above options to view the demo.
 
 ## Prerequisites
 
