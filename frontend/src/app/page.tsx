@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Card, Title, LineChart, Text, AreaChart } from "@tremor/react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import PriceChangeCard from "../components/PriceChangeCard";
 
 const CorrelationHeatmap = dynamic(
   () => import("../components/CorrelationHeatmap"),
@@ -188,6 +189,10 @@ export default function Home() {
   ]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [priceChange, setPriceChange] = useState<{
+    percentage: number;
+    symbol: string;
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,6 +203,7 @@ export default function Home() {
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
+    setPriceChange(null);
 
     try {
       const response = await fetch(
@@ -209,9 +215,13 @@ export default function Home() {
         ...prev,
         {
           role: "assistant",
-          content: data.analysis,
+          content: data.analysis.content,
         },
       ]);
+
+      if (data.analysis.price_change) {
+        setPriceChange(data.analysis.price_change);
+      }
     } catch (error) {
       setMessages((prev) => [
         ...prev,
@@ -227,138 +237,122 @@ export default function Home() {
   };
 
   return (
-    <main className="container mx-auto p-6 min-h-screen bg-gradient-to-b from-gray-900 to-gray-800">
-      <Title className="text-3xl font-bold mb-8 text-gray-100 text-center">
-        News Sense Analytics Dashboard
-      </Title>
+    <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8">
+      <div className="max-w-[1600px] mx-auto">
+        <Title className="text-4xl font-bold mb-10 text-gray-100 text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">
+          News Sense Analytics Dashboard
+        </Title>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Left Column - Analytics */}
-        <div className="space-y-8">
-          {/* <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Card className="bg-gray-800 shadow-xl rounded-xl border border-gray-700">
-              <Title className="text-xl mb-4 text-gray-100">
-                📈 Market Trends
-              </Title>
-              <LineChart
-                data={dummyData}
-                index="date"
-                categories={["value"]}
-                colors={["blue"]}
-                className="h-72"
-                showAnimation={true}
-                showLegend={false}
-                showGridLines={false}
-                showYAxis={true}
-              />
-            </Card>
-          </motion.div> */}
-
-          {/* <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            <Card className="bg-gray-800 shadow-xl rounded-xl border border-gray-700">
-              <Title className="text-xl mb-4 text-gray-100">
-                🔄 Correlation Analysis
-              </Title>
-              <CorrelationHeatmap />
-            </Card>
-          </motion.div> */}
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-          >
-            <Card className="bg-gray-800 shadow-xl rounded-xl border border-gray-700">
-              <Title className="text-xl mb-4 text-gray-100">
-                📊 Pareto Analysis
-              </Title>
-              <ParetoAnalysis />
-            </Card>
-          </motion.div>
-        </div>
-
-        {/* Right Column - Chat Interface */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-gray-800 rounded-xl shadow-xl p-6 flex flex-col h-[calc(100vh-8rem)] border border-gray-700"
-        >
-          <div className="bg-gradient-to-r from-blue-500/20 to-blue-400/10 text-gray-100 px-6 py-3 rounded-xl mb-6 flex items-center border border-blue-500/20">
-            <span className="text-xl mr-2">💬</span>
-            <span className="font-semibold">Chat with Myfi</span>
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+          {/* Left Column - Analytics */}
+          <div className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+            >
+              <Card className="bg-gray-800/50 backdrop-blur-sm shadow-2xl rounded-2xl border border-gray-700/50">
+                <Title className="text-xl mb-6 text-gray-100 flex items-center gap-2">
+                  <span className="text-blue-400">📊</span> Market Analysis
+                </Title>
+                <ParetoAnalysis />
+              </Card>
+            </motion.div>
           </div>
 
-          <div className="flex-1 overflow-y-auto space-y-6 mb-6 pr-4 custom-scrollbar">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${
-                  message.role === "user" ? "justify-end" : "justify-start"
-                }`}
-              >
+          {/* Right Column - Chat Interface */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-gray-800/50 backdrop-blur-sm rounded-2xl shadow-2xl p-6 flex flex-col h-[calc(100vh-8rem)] border border-gray-700/50"
+          >
+            <div className="bg-gradient-to-r from-blue-500/20 to-blue-400/10 text-gray-100 px-6 py-4 rounded-xl mb-6 flex items-center gap-3 border border-blue-500/20">
+              <span className="text-2xl">💬</span>
+              <div>
+                <h2 className="font-semibold text-lg">Chat with Myfi</h2>
+                <p className="text-sm text-gray-400">
+                  Your AI Financial Analyst
+                </p>
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-6 mb-6 pr-4 custom-scrollbar">
+              {messages.map((message, index) => (
                 <div
-                  className={`max-w-[85%] rounded-xl p-4 ${
-                    message.role === "user"
-                      ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white"
-                      : "bg-gradient-to-r from-gray-700 to-gray-800 text-gray-100"
+                  key={index}
+                  className={`flex ${
+                    message.role === "user" ? "justify-end" : "justify-start"
                   }`}
                 >
-                  {message.role === "assistant" && message.content ? (
-                    typeof message.content === "string" &&
-                    message.content.includes("Market Sentiment:") ? (
-                      formatAIResponse(message.content)
+                  <div
+                    className={`max-w-[85%] rounded-xl p-4 ${
+                      message.role === "user"
+                        ? "bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg"
+                        : "bg-gradient-to-r from-gray-700/50 to-gray-800/50 text-gray-100 shadow-lg"
+                    }`}
+                  >
+                    {message.role === "assistant" && message.content ? (
+                      typeof message.content === "string" &&
+                      message.content.includes("Market Sentiment:") ? (
+                        formatAIResponse(message.content)
+                      ) : (
+                        <div className="whitespace-pre-wrap leading-relaxed">
+                          {message.content}
+                        </div>
+                      )
                     ) : (
-                      <div className="whitespace-pre-wrap">
-                        {message.content}
-                      </div>
-                    )
-                  ) : (
-                    message.content || ""
-                  )}
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-gradient-to-r from-gray-700 to-gray-800 text-gray-100 rounded-xl p-4">
-                  <div className="flex items-center space-x-2">
-                    <div className="animate-pulse">⏳</div>
-                    <span>Analyzing market data...</span>
+                      message.content || ""
+                    )}
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
-
-          <form onSubmit={handleSubmit} className="mt-auto">
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about market trends..."
-                className="flex-1 p-3 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-gray-100 placeholder-gray-400"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-8 py-3 rounded-xl hover:from-blue-700 hover:to-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200"
-              >
-                Send
-              </button>
+              ))}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-gradient-to-r from-gray-700/50 to-gray-800/50 text-gray-100 rounded-xl p-4 shadow-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="animate-pulse text-blue-400">⏳</div>
+                      <span>Analyzing market data...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </form>
-        </motion.div>
+
+            {priceChange && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6"
+              >
+                <PriceChangeCard
+                  percentage={priceChange.percentage}
+                  symbol={priceChange.symbol}
+                />
+              </motion.div>
+            )}
+
+            <form onSubmit={handleSubmit} className="mt-auto">
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="Ask about market trends..."
+                  className="flex-1 p-4 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700/50 text-gray-100 placeholder-gray-400"
+                  disabled={isLoading}
+                />
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="bg-gradient-to-r from-blue-600 to-blue-500 text-white px-8 py-4 rounded-xl hover:from-blue-700 hover:to-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-all duration-200 font-medium shadow-lg"
+                >
+                  Send
+                </button>
+              </div>
+            </form>
+          </motion.div>
+        </div>
       </div>
     </main>
   );
